@@ -1,4 +1,4 @@
-function [winRate, bestTime, numberOfWins] = minesweeper(rows, columns, mines)    
+function [winRate, bestTime, numberOfWins] = minesweeper()    
 %Initialize GUI with user defined grid size, maybe max out at 50x50, MAKE
 %SURE THAT MINES IS LESS THAN ROWS * COLUMNS
 
