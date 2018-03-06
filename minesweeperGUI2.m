@@ -22,7 +22,7 @@ function varargout = minesweeperGUI2(varargin)
 
 % Edit the above text to modify the response to help minesweeperGUI2
 
-% Last Modified by GUIDE v2.5 05-Mar-2018 21:16:25
+% Last Modified by GUIDE v2.5 05-Mar-2018 22:21:53
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -79,54 +79,58 @@ function varargout = minesweeperGUI2_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
-% --- Executes on button press in pushbutton1.
-function pushbutton1_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton1 (see GCBO)
+% --- Executes on button press in Beginner.
+function Beginner_Callback(hObject, eventdata, handles)
+% hObject    handle to Beginner (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 handles.X = 9;
 handles.Y = 9;
 handles.bombs = 10;
 initializeGame(handles.X, handles.Y, handles.bombs);
+guidata(hObject, handles);
 
 
-% --- Executes on button press in pushbutton2.
-function pushbutton2_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton2 (see GCBO)
+
+% --- Executes on button press in Intermediate.
+function Intermediate_Callback(hObject, eventdata, handles)
+% hObject    handle to Intermediate (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of pushbutton2
+% Hint: get(hObject,'Value') returns toggle state of Intermediate
 
 
-% --- Executes on button press in pushbutton3.
-function pushbutton3_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton3 (see GCBO)
+% --- Executes on button press in Custom.
+function Custom_Callback(hObject, eventdata, handles)
+% hObject    handle to Custom (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on button press in pushbutton4.
-function pushbutton4_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton4 (see GCBO)
+% --- Executes on button press in Expert.
+function Expert_Callback(hObject, eventdata, handles)
+% hObject    handle to Expert (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 
 % Custom Y value callback
-function edit2_Callback(hObject, eventdata, handles)
-% hObject    handle to edit2 (see GCBO)
+function CustomY_Callback(hObject, eventdata, handles)
+% hObject    handle to CustomY (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit2 as text
-%        str2double(get(hObject,'String')) returns contents of edit2 as a double
+% Hints: get(hObject,'String') returns contents of CustomY as text
+%        str2double(get(hObject,'String')) returns contents of CustomY as a double
 handles.Y = str2double(get(hObject,'String'));
+guidata(hObject, handles);
+
 
 
 % --- Executes during object creation, after setting all properties.
-function edit2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit2 (see GCBO)
+function CustomY_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to CustomY (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -138,18 +142,18 @@ end
 
 
 
-function edit3_Callback(hObject, eventdata, handles)
-% hObject    handle to edit3 (see GCBO)
+function CustomBombs_Callback(hObject, eventdata, handles)
+% hObject    handle to CustomBombs (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit3 as text
-%        str2double(get(hObject,'String')) returns contents of edit3 as a double
+% Hints: get(hObject,'String') returns contents of CustomBombs as text
+%        str2double(get(hObject,'String')) returns contents of CustomBombs as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit3_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit3 (see GCBO)
+function CustomBombs_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to CustomBombs (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -161,18 +165,20 @@ function edit3_CreateFcn(hObject, eventdata, handles)
 
 
 % Custom X value callback
-function edit1_Callback(hObject, eventdata, handles)
-% hObject    handle to edit1 (see GCBO)
+function CustomX_Callback(hObject, eventdata, handles)
+% hObject    handle to CustomX (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit1 as text
-%        str2double(get(hObject,'String')) returns contents of edit1 as a double
+% Hints: get(hObject,'String') returns contents of CustomX as text
+%        str2double(get(hObject,'String')) returns contents of CustomX as a double
 handles.X = str2double(get(hObject,'String'));
+guidata(hObject, handles);
+
 
 % --- Executes during object creation, after setting all properties.
-function edit1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit1 (see GCBO)
+function CustomX_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to CustomX (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -184,5 +190,5 @@ end
 
 function initializeGame(X, Y, bombs)
     uncovered = imread('facingDown.png');
-    image(0, 1, uncovered);
+    image([0 1], [0 1], uncovered);
     
