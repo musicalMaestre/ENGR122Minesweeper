@@ -184,4 +184,5 @@ end
 
 function initializeGame(X, Y, bombs)
     uncovered = imread('facingDown.png');
+    image(0, 1, uncovered);
     
