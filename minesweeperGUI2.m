@@ -99,21 +99,29 @@ function Intermediate_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of Intermediate
-
+handles.X = 16;
+handles.Y = 16;
+handles.bombs = 40;
+initializeGame(handles.X, handles.Y, handles.bombs);
+guidata(hObject, handles);
 
 % --- Executes on button press in Custom.
 function Custom_Callback(hObject, eventdata, handles)
 % hObject    handle to Custom (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+initializeGame(handles.X, handles.Y, handles.bombs);
 
 % --- Executes on button press in Expert.
 function Expert_Callback(hObject, eventdata, handles)
 % hObject    handle to Expert (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+handles.X = 24;
+handles.Y = 24;
+handles.bombs = 99;
+initializeGame(handles.X, handles.Y, handles.bombs);
+guidata(hObject, handles);
 
 % Custom Y value callback
 function CustomY_Callback(hObject, eventdata, handles)
@@ -189,6 +197,12 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 function initializeGame(X, Y, bombs)
-    uncovered = imread('facingDown.png');
-    image([0 1], [0 1], uncovered);
+    uncovered = imread('facingDown.jpg');
+    for i = 0:X
+        for j = 0:Y
+            image([0+i 1+i], [0+j 1+j], uncovered);
+            hold on
+        end
+    end
+    axis([0 X 0 Y]);
     
