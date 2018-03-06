@@ -22,7 +22,7 @@ function varargout = minesweeperGUI2(varargin)
 
 % Edit the above text to modify the response to help minesweeperGUI2
 
-% Last Modified by GUIDE v2.5 05-Mar-2018 20:44:35
+% Last Modified by GUIDE v2.5 05-Mar-2018 21:16:25
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -112,7 +112,7 @@ function pushbutton4_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-
+% Custom Y value callback
 function edit2_Callback(hObject, eventdata, handles)
 % hObject    handle to edit2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -134,6 +134,7 @@ function edit2_CreateFcn(hObject, eventdata, handles)
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
+end
 end
 
 
