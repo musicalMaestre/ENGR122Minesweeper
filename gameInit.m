@@ -1,42 +1,30 @@
-endGame = 0;
-mineTable = zeros(X,Y);
-[height, width] = size(mineTable);
+mineTable = zeros(X,Y); %creates a table where of zeros where the bombs and numbers will be placed
+[height, width] = size(mineTable); %grab sizes for the table for later use (may be unnessary in retrospect)
 
-mineOverlay = placeBombs(height, width, bombs, mineTable);
-mineTable = placeOnMap(mineTable, mineOverlay);
+mineTable = placeBombs(height, width, bombs, mineTable); %runs a function to place the bombs on the mineTable
 clear mineOverlay;
-mineTable = numSet(mineTable, height, width);
+mineTable = numSet(mineTable, height, width); %adds the numbers that go around it
 
-function mineOverlay = placeBombs(height, width, bombs, mineTable)
-mineOverlay = mineTable;
-count = 0;
-while count < bombs
+function mineTable = placeBombs(height, width, bombs, mineTable) %creates the place of the bombs
+count = 0; %initalize a count which will allow us to place bombs until there are enough bombs
+while count < bombs %while there are less bombs then needed
     row = randi([1, height]);
-    col = randi([1, width]);
-    if mineOverlay(row, col) ~= 9
-        mineOverlay(row,col) = 9; %9 = bomb
-        count = count + 1;
+    col = randi([1, width]); %choose a random x and y
+    if mineTable(row, col) ~= 9 %if there are no bombs on that spot
+        mineTable(row,col) = 9; %(9 = bomb) place a bomb there
+        count = count + 1; %and remember that there is one more bomb on the map
     end
 end
 end
 
-function mineTable = placeOnMap(mineTable, mineOverlay)
-[heightOver, widthOver] = size(mineOverlay);
-for n = 1:heightOver
-    for m = 1:widthOver
-        mineTable(n,m) = mineOverlay(n,m);
-    end
-end
-end
-
-function mineTable = numSet(mineTable, height, width)
+function mineTable = numSet(mineTable, height, width) %creates the numbers around the bombs
 for n = 1:height
     for m = 1:width
-        if mineTable(n, m) == 9
+        if mineTable(n, m) == 9 %finds the bombs
             for row = n-1:n+1
-                for col = m-1:m+1
-                    if row >= 1 && row <= height && col >= 1 && col <= width && mineTable(row, col) ~= 9
-                        mineTable(row, col) = mineTable(row, col) + 1;
+                for col = m-1:m+1 %for each spot around it
+                    if row >= 1 && row <= height && col >= 1 && col <= width && mineTable(row, col) ~= 9 %if the spot exists and is not a bomb
+                        mineTable(row, col) = mineTable(row, col) + 1; %add one to the value of that spot
                     end
                 end
             end

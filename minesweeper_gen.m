@@ -1,99 +1,39 @@
-question = ('Please choose difficulty, Beginner (9x9, 10 bombs), Intermediate (16x16, 40 bombs), Expert (24x24, 99 bombs) or Custom\n');
-choice = input(question, 's');
-if strcmpi(choice, 'Beginner')
-    X = 9; Y = 9;
-    bombs = 10;
-elseif strcmpi(choice, 'Intermediate')
-    X = 16; Y = 16;
-    bombs = 40;
-elseif strcmpi(choice, 'Expert')
-    X = 24; Y = 24;
-    bombs = 99;  
-elseif strcmpi(choice, 'Custom')
-    heightPrompt = 'Height\n'; widthPrompt = 'Width\n'; bombPrompt = 'Bombs\n';
-    X = input(heightPrompt);
-    Y = input (widthPrompt);
-    bombs = input(bombPrompt);
-end
+%before this you need to run gameInit this all the function generating the
+%game maps, comments for it or on the file
 
-load('statistics.mat');
-
-endGame = 0;
-mineTable = zeros(X,Y);
-[height, width] = size(mineTable);
-colPrompt = ('Chose a row\n');
-rowPrompt = ('Unknown spaces are represented by 100 \n\nChose a column\n');
-typePrompt = ('For a flag type "F", to click type "C" (Flags are represented by 70)\n');
-
-mineOverlay = placeBombs(height, width, bombs, mineTable);
-mineTable = placeOnMap(mineTable, mineOverlay);
-mineTable = numSet(mineTable, height, width);
-clear mineOverlay; clear bombPromt; clear heightPrompt; clear question; clear widthPrompt;
-
-gameMap = zeros(X, Y);
-for n = 1:X
-    for m = 1:Y
-        gameMap(n,m) = 'd';
-    end
-end
-[gameMap, gamesWon, gamesLost, gameTime, winStreak] = gamePlay(mineTable, gameMap, rowPrompt, colPrompt, typePrompt, height, width, bombs, gamesWon, gamesLost, winStreak);
+load('statistics'); %load the file 'statistics' before so that it's variables can be used (if that file doesn't exist run resetStats
+[gameMap, gamesWon, gamesLost, gameTime, winStreak] = gamePlay(mineTable, gameMap, height, width, bombs, gamesWon, gamesLost, winStreak); %this is the actual gameplay, comments on actual play below.
 disp(gameMap)
-allTimes = [allTimes, gameTime];
-
+allTimes = [allTimes, gameTime]; %these are generation of random statistics 
 bestTime = min(allTimes);
 avgTime = sum(allTimes)/numel(allTimes);
 totalGames = gamesWon + gamesLost;
 percentWin = (gamesWon / totalGames) * 100;
-percentLoss = (gamesLost / totalGames) * 100;
+percentLoss = (gamesLost / totalGames) * 100; %which ends here
 
-save('statistics.mat', 'gamesWon', 'gamesLost', 'allTimes', 'winStreak');
-
-
-function mineOverlay = placeBombs(height, width, bombs, mineTable)
-mineOverlay = mineTable;
-count = 0;
-while count < bombs
-    row = randi([1, height]);
-    col = randi([1, width]);
-    if mineOverlay(row, col) ~= 9
-        mineOverlay(row,col) = 9; %9 = bomb
-        count = count + 1;
-    end
-end
-end
-
-function mineTable = placeOnMap(mineTable, mineOverlay)
-[heightOver, widthOver] = size(mineOverlay);
-for n = 1:heightOver
-    for m = 1:widthOver
-        mineTable(n,m) = mineOverlay(n,m);
-    end
-end
-end
-
-function mineTable = numSet(mineTable, height, width)
-for n = 1:height
-    for m = 1:width
-        if mineTable(n, m) == 9
-            for row = n-1:n+1
-                for col = m-1:m+1
-                    if row >= 1 && row <= height && col >= 1 && col <= width && mineTable(row, col) ~= 9
-                        mineTable(row, col) = mineTable(row, col) + 1;
-                    end
-                end
-            end
-        end
-    end
-end
-end
+save('statistics.mat', 'gamesWon', 'gamesLost', 'allTimes', 'winStreak'); %saves the stats that everything is calculated from for the next go around
+                                                                          %if you want to reset that stats run resetStats
 
 function gameMap = openSpots(row, col, mineTable, gameMap, height, width)
-gameMap(col, row) = mineTable(col, row);
+gameMap(col, row) = mineTable(col, row); %this function checks all spots and opens the spots around blank slots
 for n = 1:height
-    for m = 1:width
+    for m = 1:width %for each spot
+        for Row = n-1:n+1
+            for Col = m-1:m+1 %for each spot around it
+                if Row >= 1 && Row <= height && Col >= 1 && Col <= width %if the spot being checked is within bounds
+                    if gameMap(m, n) == 0
+                        gameMap(Col, Row) = mineTable(Col, Row); %then reveal the spots around it
+                    end
+                end
+            end
+        end
+    end
+end
+for n = height:-1:1 %do it again but going the other way. this is too avoid recursive function because whenever I tried it like that it would return a stack overflow
+    for m = width:-1:1 %the first half does everything to the bottom and left of the point, and the second half does everything to the top and right
         for Row = n-1:n+1
             for Col = m-1:m+1
-                if Row >= 1 && Row <= height && Col >= 1 && Col <= width && mineTable(Col, Row) ~= 9
+                if Row >= 1 && Row <= height && Col >= 1 && Col <= width
                     if gameMap(m, n) == 0
                         gameMap(Col, Row) = mineTable(Col, Row);
                     end
@@ -102,77 +42,63 @@ for n = 1:height
         end
     end
 end
-for n = height:-1:1
-    for m = width:-1:1
-        for Row = n-1:n+1
-            for Col = m-1:m+1
-                if Row >= 1 && Row <= height && Col >= 1 && Col <= width && mineTable(Col, Row) ~= 9
-                    if gameMap(m, n) == 0
-                        gameMap(Col, Row) = mineTable(Col, Row);
-                    end
-                end
-            end
-        end
-    end
-end
-end
+end 
 
 
-function [gameMap, gamesWon, gamesLost, gameTime, winStreak] = gamePlay(mineTable, gameMap, rowPrompt, colPrompt, typePrompt, height, width, bombs, gamesWon, gamesLost, winStreak)
-endGame = 0;
-tic;
-while endGame < bombs && endGame >= 0
-    disp(gameMap)
-    row = input(rowPrompt);
-    col = input(colPrompt);
-    type = input(typePrompt, 's');
-    endGame = 0;
-    if row <= height && col <= width
-        if strcmpi(type, 'F')
-            if gameMap(col, row) ~= 'F'
-                gameMap(col, row) = 'F';
+function [gameMap, gamesWon, gamesLost, gameTime, winStreak] = gamePlay(mineTable, gameMap, height, width, bombs, gamesWon, gamesLost, winStreak) %this is the actual game there are currently a couple of peices missing because I removed them, but I'll say what they are and where they should go
+endGame = 0; %this initializes the end of game variable, it also is the marker for whether you win or lose
+tic; %starts the game timer for statistical purposes
+while endGame < bombs && endGame >= 0 %the actual game and this keeps going until you click on a bomb or flag all of them
+    endGame = 0; %reset the end of game so that there isn't an early win
+    %here you need to add the input for which spot is choosen and flag or a
+    %regular click
+    if row >= 1 && row <= height && col >= 1 && col <= width %if it is a legal move (should be less needed with GUI) (row and col can be changed)
+        if strcmpi(type, 'F') %if flag was choosen
+            if gameMap(col, row) ~= 'F' %and there is no flag
+                gameMap(col, row) = 'F'; %flag that spot (nothing then stops you from choosing it though)
             else
-                gameMap(col, row) = 'd';
+                gameMap(col, row) = 'd'; %if there is a flag, remove it
             end
-        else
-            if mineTable(col, row) == 9
+        else %if the spot was choosen to be clicked
+            if mineTable(col, row) == 9 %if it is a nine(bomb)
                 for n = 1:height
                     for m = 1:width
                         if mineTable(m,n) == 9
-                            gameMap(m,n) = mineTable(m,n);
+                            gameMap(m,n) = mineTable(m,n); %reveal all the bombs (and no new info)
                         end
                     end
                 end
-                endGame = -1;
-            elseif mineTable(col, row) == 0
-                gameMap = openSpots(row, col, mineTable, gameMap, height, width);
+                endGame = -1; %and set endGame to -1 so that the game ends with a loss
+            elseif mineTable(col, row) == 0 %if the spot is a zero
+                gameMap = openSpots(row, col, mineTable, gameMap, height, width); %reveal all zeros near it
             else
-                gameMap(col, row) = mineTable(col, row);
+                gameMap(col, row) = mineTable(col, row); %otherwise just reveal that spot
             end
         end
-        if endGame < bombs && endGame >= 0
+        if endGame < bombs && endGame >= 0 %if you haven't lost yet
             endGame = 0;
             for n = 1:height
                 for m = 1:width
-                    if gameMap(m, n) == 70 && mineTable(m, n) == 9
-                        endGame = endGame + 1;
-                    elseif gameMap(m, n) == 70 && mineTable(m, n) ~=9
-                        endGame = endGame - 1;
+                    if gameMap(m, n) == 70 && mineTable(m, n) == 9 %check each bomb for a flag
+                        endGame = endGame + 1; %and add one to the endGame counter
+                    elseif gameMap(m, n) == 70 && mineTable(m, n) ~=9 %if there is a flag with no bomb
+                        endGame = endGame - 1; %remove one from the endGame counter so that you don't win unless only the bombs are flaged
                     end
                 end
             end
         end
     end
 end
-if endGame == bombs
-    gamesWon = gamesWon + 1;
-    disp('You Win')
-    winStreak = winStreak + 1;
-elseif endGame < 0
-    gamesLost = gamesLost + 1;
-    disp('You Lose')
-    winStreak = 0;
+%the game ending loop
+if endGame == bombs %if all the bombs are flagged
+    gamesWon = gamesWon + 1; %add one to the amount of games one(for statistics)
+    disp('You Win') %say that you win
+    winStreak = winStreak + 1; %and up the win streak
+    gameTime = toc; %end the timer and store the time
+elseif endGame < 0 %if you lose
+    gamesLost = gamesLost + 1; %add one to the amount of games lost (for statistics)
+    disp('You Lose') %say that you lost
+    winStreak = 0; %and reset the win streak
+    gameTime = toc; %end the timer and store the time
 end
-gameTime = toc;
-
 end

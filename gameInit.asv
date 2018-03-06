@@ -1,0 +1,45 @@
+mineTable = zeros(X,Y); %creates a table where of zeros where the bombs and numbers will be placed
+[height, width] = size(mineTable); %grab sizes for the table for later use (may be unnessary in retrospect)
+
+mineOverlay = placeBombs(height, width, bombs, mineTable); %runs a function to create the place of the bombs
+mineTable = placeOnMap(mineTable, mineOverlay); %places the bombs on the mineTable
+clear mineOverlay;
+mineTable = numSet(mineTable, height, width); %adds the numbers that go around it
+
+function mineOverlay = placeBombs(height, width, bombs, mineTable) %creates the place of the bombs
+mineOverlay = mineTable;
+count = 0;
+while count < bombs
+    row = randi([1, height]);
+    col = randi([1, width]);
+    if mineOverlay(row, col) ~= 9
+        mineOverlay(row,col) = 9; %9 = bomb
+        count = count + 1;
+    end
+end
+end
+
+function mineTable = placeOnMap(mineTable, mineOverlay)
+[heightOver, widthOver] = size(mineOverlay);
+for n = 1:heightOver
+    for m = 1:widthOver
+        mineTable(n,m) = mineOverlay(n,m);
+    end
+end
+end
+
+function mineTable = numSet(mineTable, height, width)
+for n = 1:height
+    for m = 1:width
+        if mineTable(n, m) == 9
+            for row = n-1:n+1
+                for col = m-1:m+1
+                    if row >= 1 && row <= height && col >= 1 && col <= width && mineTable(row, col) ~= 9
+                        mineTable(row, col) = mineTable(row, col) + 1;
+                    end
+                end
+            end
+        end
+    end
+end
+end
