@@ -87,6 +87,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 handles.X = 9;
 handles.Y = 9;
 handles.bombs = 10;
+initializeGame(handles.X, handles.Y, handles.bombs);
 
 
 % --- Executes on button press in pushbutton2.
@@ -167,7 +168,7 @@ function edit1_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit1 as text
 %        str2double(get(hObject,'String')) returns contents of edit1 as a double
-X = str2double(get(hObject,'String'));
+handles.X = str2double(get(hObject,'String'));
 
 % --- Executes during object creation, after setting all properties.
 function edit1_CreateFcn(hObject, eventdata, handles)
@@ -180,3 +181,7 @@ function edit1_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+function initializeGame(X, Y, bombs)
+    uncovered = imread('facingDown.png');
+    
