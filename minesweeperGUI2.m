@@ -56,6 +56,7 @@ function minesweeperGUI2_OpeningFcn(hObject, eventdata, handles, varargin)
     handles.X = 0;
     handles.Y = 0;
     handles.bombs = 0;
+    load('statistics.mat');
     
 % Choose default command line output for minesweeperGUI2
 handles.output = hObject;
@@ -86,7 +87,6 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 handles.X = 9;
 handles.Y = 9;
 handles.bombs = 10;
-end
 
 
 % --- Executes on button press in pushbutton2.
@@ -121,7 +121,6 @@ function edit2_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit2 as text
 %        str2double(get(hObject,'String')) returns contents of edit2 as a double
 handles.Y = str2double(get(hObject,'String'));
-end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -134,7 +133,6 @@ function edit2_CreateFcn(hObject, eventdata, handles)
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
-end
 end
 
 
@@ -159,7 +157,6 @@ function edit3_CreateFcn(hObject, eventdata, handles)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
-end
 
 
 % Custom X value callback
@@ -171,7 +168,6 @@ function edit1_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit1 as text
 %        str2double(get(hObject,'String')) returns contents of edit1 as a double
 X = str2double(get(hObject,'String'));
-end
 
 % --- Executes during object creation, after setting all properties.
 function edit1_CreateFcn(hObject, eventdata, handles)
@@ -183,5 +179,4 @@ function edit1_CreateFcn(hObject, eventdata, handles)
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
-end
 end
