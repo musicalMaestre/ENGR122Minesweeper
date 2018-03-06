@@ -8,7 +8,7 @@ elseif strcmpi(choice, 'Intermediate')
     bombs = 40;
 elseif strcmpi(choice, 'Expert')
     X = 24; Y = 24;
-    bombs = 99;
+    bombs = 99;  
 elseif strcmpi(choice, 'Custom')
     heightPrompt = 'Height\n'; widthPrompt = 'Width\n'; bombPrompt = 'Bombs\n';
     X = input(heightPrompt);
@@ -28,7 +28,7 @@ typePrompt = ('For a flag type "F", to click type "C" (Flags are represented by 
 mineOverlay = placeBombs(height, width, bombs, mineTable);
 mineTable = placeOnMap(mineTable, mineOverlay);
 mineTable = numSet(mineTable, height, width);
-clear count; clear mineOverlay; clear bombPromt; clear heightPrompt; clear question; clear widthPrompt;
+clear mineOverlay; clear bombPromt; clear heightPrompt; clear question; clear widthPrompt;
 
 gameMap = zeros(X, Y);
 for n = 1:X

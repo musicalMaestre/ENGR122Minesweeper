@@ -19,16 +19,16 @@ end
 load('statistics.mat');
 
 endGame = 0;
-minePlace = zeros(X,Y);
-[height, width] = size(minePlace);
+mineTable = zeros(X,Y);
+[height, width] = size(mineTable);
 colPrompt = ('Chose a row\n');
 rowPrompt = ('Unknown spaces are represented by 100 \n\nChose a column\n');
 typePrompt = ('For a flag type "F", to click type "C" (Flags are represented by 70)\n');
 
-minePlace = placeBombs(height, width, bombs, minePlace);
-minePlace = placeOnMap(minePlace, minePlace);
-minePlace = numSet(minePlace, height, width);
-clear count; clear minePlace; clear bombPromt; clear heightPrompt; clear question; clear widthPrompt;
+mineOverlay = placeBombs(height, width, bombs, mineTable);
+mineTable = placeOnMap(mineTable, mineOverlay);
+mineTable = numSet(mineTable, height, width);
+clear count; clear mineOverlay; clear bombPromt; clear heightPrompt; clear question; clear widthPrompt;
 
 gameMap = zeros(X, Y);
 for n = 1:X
@@ -36,7 +36,7 @@ for n = 1:X
         gameMap(n,m) = 'd';
     end
 end
-[gameMap, gamesWon, gamesLost, gameTime, winStreak] = gamePlay(minePlace, gameMap, rowPrompt, colPrompt, typePrompt, height, width, bombs, gamesWon, gamesLost, winStreak);
+[gameMap, gamesWon, gamesLost, gameTime, winStreak] = gamePlay(mineTable, gameMap, rowPrompt, colPrompt, typePrompt, height, width, bombs, gamesWon, gamesLost, winStreak);
 disp(gameMap)
 allTimes = [allTimes, gameTime];
 
@@ -49,27 +49,36 @@ percentLoss = (gamesLost / totalGames) * 100;
 save('statistics.mat', 'gamesWon', 'gamesLost', 'allTimes', 'winStreak');
 
 
-function minePlace = placeBombs(height, width, bombs)
+function mineOverlay = placeBombs(height, width, bombs, mineTable)
+mineOverlay = mineTable;
 count = 0;
 while count < bombs
     row = randi([1, height]);
     col = randi([1, width]);
-    if minePlace(row, col) ~= 9
-        minePlace(row,col) = 9; %9 = bomb
+    if mineOverlay(row, col) ~= 9
+        mineOverlay(row,col) = 9; %9 = bomb
         count = count + 1;
     end
 end
 end
 
+function mineTable = placeOnMap(mineTable, mineOverlay)
+[heightOver, widthOver] = size(mineOverlay);
+for n = 1:heightOver
+    for m = 1:widthOver
+        mineTable(n,m) = mineOverlay(n,m);
+    end
+end
+end
 
-function minePlace = numSet(minePlace, height, width)
+function mineTable = numSet(mineTable, height, width)
 for n = 1:height
     for m = 1:width
-        if minePlace(n, m) == 9
+        if mineTable(n, m) == 9
             for row = n-1:n+1
                 for col = m-1:m+1
-                    if row >= 1 && row <= height && col >= 1 && col <= width && minePlace(row, col) ~= 9
-                        minePlace(row, col) = minePlace(row, col) + 1;
+                    if row >= 1 && row <= height && col >= 1 && col <= width && mineTable(row, col) ~= 9
+                        mineTable(row, col) = mineTable(row, col) + 1;
                     end
                 end
             end
@@ -78,15 +87,15 @@ for n = 1:height
 end
 end
 
-function gameMap = openSpots(row, col, minePlace, gameMap, height, width)
-gameMap(col, row) = minePlace(col, row);
+function gameMap = openSpots(row, col, mineTable, gameMap, height, width)
+gameMap(col, row) = mineTable(col, row);
 for n = 1:height
     for m = 1:width
         for Row = n-1:n+1
             for Col = m-1:m+1
-                if Row >= 1 && Row <= height && Col >= 1 && Col <= width && minePlace(Col, Row) ~= 9
+                if Row >= 1 && Row <= height && Col >= 1 && Col <= width && mineTable(Col, Row) ~= 9
                     if gameMap(m, n) == 0
-                        gameMap(Col, Row) = minePlace(Col, Row);
+                        gameMap(Col, Row) = mineTable(Col, Row);
                     end
                 end
             end
@@ -97,9 +106,9 @@ for n = height:-1:1
     for m = width:-1:1
         for Row = n-1:n+1
             for Col = m-1:m+1
-                if Row >= 1 && Row <= height && Col >= 1 && Col <= width && minePlace(Col, Row) ~= 9
+                if Row >= 1 && Row <= height && Col >= 1 && Col <= width && mineTable(Col, Row) ~= 9
                     if gameMap(m, n) == 0
-                        gameMap(Col, Row) = minePlace(Col, Row);
+                        gameMap(Col, Row) = mineTable(Col, Row);
                     end
                 end
             end
@@ -109,7 +118,7 @@ end
 end
 
 
-function [gameMap, gamesWon, gamesLost, gameTime, winStreak] = gamePlay(minePlace, gameMap, rowPrompt, colPrompt, typePrompt, height, width, bombs, gamesWon, gamesLost, winStreak)
+function [gameMap, gamesWon, gamesLost, gameTime, winStreak] = gamePlay(mineTable, gameMap, rowPrompt, colPrompt, typePrompt, height, width, bombs, gamesWon, gamesLost, winStreak)
 endGame = 0;
 tic;
 while endGame < bombs && endGame >= 0
@@ -126,28 +135,28 @@ while endGame < bombs && endGame >= 0
                 gameMap(col, row) = 'd';
             end
         else
-            if minePlace(col, row) == 9
+            if mineTable(col, row) == 9
                 for n = 1:height
                     for m = 1:width
-                        if minePlace(m,n) == 9
-                            gameMap(m,n) = minePlace(m,n);
+                        if mineTable(m,n) == 9
+                            gameMap(m,n) = mineTable(m,n);
                         end
                     end
                 end
                 endGame = -1;
-            elseif minePlace(col, row) == 0
-                gameMap = openSpots(row, col, minePlace, gameMap, height, width);
+            elseif mineTable(col, row) == 0
+                gameMap = openSpots(row, col, mineTable, gameMap, height, width);
             else
-                gameMap(col, row) = minePlace(col, row);
+                gameMap(col, row) = mineTable(col, row);
             end
         end
         if endGame < bombs && endGame >= 0
             endGame = 0;
             for n = 1:height
                 for m = 1:width
-                    if gameMap(m, n) == 70 && minePlace(m, n) == 9
+                    if gameMap(m, n) == 70 && mineTable(m, n) == 9
                         endGame = endGame + 1;
-                    elseif gameMap(m, n) == 70 && minePlace(m, n) ~=9
+                    elseif gameMap(m, n) == 70 && mineTable(m, n) ~=9
                         endGame = endGame - 1;
                     end
                 end
