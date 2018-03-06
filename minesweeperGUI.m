@@ -22,7 +22,7 @@ function varargout = minesweeperGUI(varargin)
 
 % Edit the above text to modify the response to help minesweeperGUI
 
-% Last Modified by GUIDE v2.5 04-Mar-2018 22:27:59
+% Last Modified by GUIDE v2.5 05-Mar-2018 20:29:42
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -176,4 +176,24 @@ function edit5_CreateFcn(hObject, eventdata, handles)
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
+end
+
+
+% --- If Enable == 'on', executes on mouse press in 5 pixel border.
+% --- Otherwise, executes on mouse press in 5 pixel border or over pushbutton4.
+function pushbutton4_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to pushbutton4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+X = 9; Y = 9; bombs = 10;
+end
+
+
+% --- If Enable == 'on', executes on mouse press in 5 pixel border.
+% --- Otherwise, executes on mouse press in 5 pixel border or over pushbutton6.
+function pushbutton6_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to pushbutton6 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+X = 16; Y = 16; bombs = 40;
 end
