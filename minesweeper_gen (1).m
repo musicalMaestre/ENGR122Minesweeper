@@ -16,7 +16,7 @@ elseif strcmpi(choice, 'Custom')
     bombs = input(bombPrompt);
 end
 
-load('gameStats.mat');
+load('statistics.mat');
 
 endGame = 0;
 minePlace = zeros(X,Y);
@@ -36,17 +36,17 @@ for n = 1:X
         gameMap(n,m) = 'd';
     end
 end
-[gameMap, gamesWon, gamesLost, gameTime] = gamePlay(mineMap, minePlace, gameMap, rowPrompt, colPrompt, typePrompt, height, width, bombs, gamesWon, gamesLost);
+[gameMap, gamesWon, gamesLost, gameTime, winStreak] = gamePlay(mineMap, minePlace, gameMap, rowPrompt, colPrompt, typePrompt, height, width, bombs, gamesWon, gamesLost, winStreak);
 disp(gameMap)
 allTimes = [allTimes, gameTime];
 
 bestTime = max(allTimes);
-avgTime = sume(allTimes)/numel(alTimes);
+avgTime = sum(allTimes)/numel(allTimes);
 totalGames = gamesWon + gamesLost;
 percentWin = (gamesWon / totalGames) * 100;
 percentLoss = (gamesLost / totalGames) * 100;
 
-save('statics.mat', 'gamesWon', 'gamesLost', 'allTimes')
+save('statistics.mat', 'gamesWon', 'gamesLost', 'allTimes', 'winStreak');
 
 
 function mineOverlay = placeBombs(height, width, bombs, minePlace)
@@ -119,9 +119,9 @@ end
 end
 
 
-function [gameMap, gamesWon, gamesLost, gameTime] = gamePlay(mineMap, minePlace, gameMap, rowPrompt, colPrompt, typePrompt, height, width, bombs, gamesWon, gamesLost)
+function [gameMap, gamesWon, gamesLost, gameTime, winStreak] = gamePlay(mineMap, minePlace, gameMap, rowPrompt, colPrompt, typePrompt, height, width, bombs, gamesWon, gamesLost, winStreak)
 endGame = 0;
-start = tic;
+tic;
 while endGame < bombs && endGame >= 0
     disp(gameMap)
     row = input(rowPrompt);
@@ -168,10 +168,12 @@ end
 if endGame == bombs
     gamesWon = gamesWon + 1;
     disp('You Win')
+    winStreak = winStreak + 1;
 elseif endGame < 0
     gamesLost = gamesLost + 1;
     disp('You Lose')
+    winStreak = 0;
 end
-stop = toc;
-gameTime = stop - start;
+gameTime = toc;
+
 end
