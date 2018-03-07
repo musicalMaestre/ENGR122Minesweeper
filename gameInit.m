@@ -1,3 +1,4 @@
+%foo
 mineTable = zeros(X,Y); %creates a table where of zeros where the bombs and numbers will be placed
 [height, width] = size(mineTable); %grab sizes for the table for later use (may be unnessary in retrospect)
 
