@@ -22,7 +22,7 @@ function varargout = minesweeperGUI2(varargin)
 
 % Edit the above text to modify the response to help minesweeperGUI2
 
-% Last Modified by GUIDE v2.5 06-Mar-2018 21:13:59
+% Last Modified by GUIDE v2.5 06-Mar-2018 20:07:28
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -205,12 +205,12 @@ function gameWindow_ButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to gameWindow (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[handles.xClick, handles.yClick, handles.clickType] =  ginput(1);
-[tempX, tempY] = click2index(handles.xClick, handles.yClick);
+[handles.xClick, handles.yClick, handles.clickType] =  ginput(...)
+[tempX tempY] = click2index(handles.xClick, handles.yClick);
 guidata(hObject, handles);
 
 function initializeGame(X, Y, bombs)
-    uncovered = imread('facingDown.jpg'); %graphs the block image X * Y times in a 
+    uncovered = imread('facingDown.jpg');
     for i = 0:X
         for j = 0:Y
             image([0+i 1+i], [0+j 1+j], uncovered);
