@@ -22,7 +22,7 @@ function varargout = minesweeperGUI2(varargin)
 
 % Edit the above text to modify the response to help minesweeperGUI2
 
-% Last Modified by GUIDE v2.5 06-Mar-2018 20:07:28
+% Last Modified by GUIDE v2.5 06-Mar-2018 21:13:59
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -108,12 +108,14 @@ handles.bombs = 40;
 initializeGame(handles.X, handles.Y, handles.bombs);
 guidata(hObject, handles);
 
+
 % --- Executes on button press in Custom.
 function Custom_Callback(hObject, eventdata, handles)
 % hObject    handle to Custom (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 initializeGame(handles.X, handles.Y, handles.bombs);
+end
 
 % --- Executes on button press in Expert.
 function Expert_Callback(hObject, eventdata, handles)
@@ -125,6 +127,7 @@ handles.Y = 24;
 handles.bombs = 99;
 initializeGame(handles.X, handles.Y, handles.bombs);
 guidata(hObject, handles);
+
 
 % Custom Y value callback
 function CustomY_Callback(hObject, eventdata, handles)
@@ -163,6 +166,7 @@ function CustomBombs_Callback(hObject, eventdata, handles)
 handles.bombs = str2double(get(hObject, 'String'));
 guidata(hObject, handles);
 
+
 % --- Executes during object creation, after setting all properties.
 function CustomBombs_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to CustomBombs (see GCBO)
@@ -188,6 +192,7 @@ handles.X = str2double(get(hObject,'String'));
 guidata(hObject, handles);
 
 
+
 % --- Executes during object creation, after setting all properties.
 function CustomX_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to CustomX (see GCBO)
@@ -200,17 +205,21 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
+
 % --- Executes on mouse press over axes background.
 function gameWindow_ButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to gameWindow (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[handles.xClick, handles.yClick, handles.clickType] =  ginput(...)
-[tempX tempY] = click2index(handles.xClick, handles.yClick);
+[handles.xClick, handles.yClick, handles.clickType] =  ginput(1);
+[tempX, tempY] = click2index(handles.xClick, handles.yClick);
+handles.xIndex = tempX;
+handles.yIndex = tempY;
 guidata(hObject, handles);
 
-function initializeGame(X, Y, bombs)
-    uncovered = imread('facingDown.jpg');
+
+function mineTalbeinitializeGame(X, Y, bombs)
+    uncovered = imread('facingDown.jpg'); %graphs the block image X * Y times in a 
     for i = 0:X
         for j = 0:Y
             image([0+i 1+i], [0+j 1+j], uncovered);
@@ -222,6 +231,10 @@ function initializeGame(X, Y, bombs)
     mineTable = placeBombs(handles.X, handles.Y, handles.bombs, mineTable); %runs a function to place the bombs on the mineTable
     clear mineOverlay;
     mineTable = numSet(mineTable, handles.X, handles.Y); %adds the numbers that go around it
+    
+    gameMap = zeros(X, Y)
+    gameMap(:,:) = 10; %gameMap is now full of uncovered squares (10)
+    
     
 function mineTable = placeBombs(X, Y, bombs, mineTable) %creates the place of the bombs
 count = 0; %initalize a count which will allow us to place bombs until there are enough bombs
@@ -249,6 +262,7 @@ for n = 1:X
     end
 end
 
+
 function [allTimes, bestTime, avgTime, totalGames, percentWin, percentLoss] = statistics(allTimes, gameTime)
 allTimes = [allTimes, gameTime]; %these generate statistics 
 bestTime = min(allTimes);
@@ -266,6 +280,94 @@ guidata(hObjects, handles);
 
 save('statistics.mat', 'gamesWon', 'gamesLost', 'allTimes', 'winStreak'); %saves the stats that everything is calculated from for the next go around
 
+
 function [xIndex, yIndex] = click2index(xClick, yClick)
 xIndex = ceil(xClick);
 yIndex = ceil(yClick);
+
+
+function gameMap = openSpots(mineTable, gameMap, height, width) %this function checks all spots and opens the spots around blank slots
+for n = 1:height
+    for m = 1:width %for each spot
+        for Row = n-1:n+1
+            for Col = m-1:m+1 %for each spot around it
+                if Row >= 1 && Row <= height && Col >= 1 && Col <= width %if the spot being checked is within bounds
+                    if gameMap(m, n) == 0
+                        gameMap(Col, Row) = mineTable(Col, Row); %then reveal the spots around it
+                    end
+                end
+            end
+        end
+    end
+end
+for n = height:-1:1 %do it again but going the other way. this is too avoid recursive function because whenever I tried it like that it would return a stack overflow
+    for m = width:-1:1 %the first half does everything to the bottom and left of the point, and the second half does everything to the top and right
+        for Row = n-1:n+1
+            for Col = m-1:m+1
+                if Row >= 1 && Row <= height && Col >= 1 && Col <= width
+                    if gameMap(m, n) == 0
+                        gameMap(Col, Row) = mineTable(Col, Row);
+                    end
+                end
+            end
+        end
+    end
+end
+
+
+function [gameMap, gamesWon, gamesLost, gameTime, winStreak] = gamePlay(mineTable, gameMap, height, width, bombs, gamesWon, gamesLost, winStreak, xIndex, yIndex, clickType) %this is the actual game there are currently a couple of peices missing because I removed them, but I'll say what they are and where they should go
+endGame = 0; %this initializes the end of game variable, it also is the marker for whether you win or lose
+tic; %starts the game timer for statistical purposes
+while endGame < bombs && endGame >= 0 %the actual game and this keeps going until you click on a bomb or flag all of them
+    endGame = 0; %reset the end of game so that there isn't an early win
+    %here you need to add the input for which spot is choosen and flag or a
+    %regular click
+    if yIndex >= 1 && yIndex <= height && xIndex >= 1 && xIndex <= width %if it is a legal move (should be less needed with GUI) (row and col can be changed)
+        if clickType == 3 %if flag was choosen
+            if gameMap(xIndex, yIndex) ~= 11 %and there is no flag
+                gameMap(xIndex, yIndex) = 11; %flag that spot (nothing then stops you from choosing it though)
+            else
+                gameMap(xIndex, yIndex) = 10; %if there is a flag, remove it
+            end
+        else %if the spot was choosen to be clicked
+            if mineTable(xIndex, yIndex) == 9 %if it is a nine(bomb)
+                for n = 1:height
+                    for m = 1:width
+                        if mineTable(m,n) == 9
+                            gameMap(m,n) = mineTable(m,n); %reveal all the bombs (and no new info)
+                        end
+                    end
+                end
+                endGame = -1; %and set endGame to -1 so that the game ends with a loss
+            elseif mineTable(xIndex, yIndex) == 0 %if the spot is a zero
+                gameMap = openSpots(yIndex, xIndex, mineTable, gameMap, height, width); %reveal all zeros near it
+            else
+                gameMap(xIndex, yIndex) = mineTable(xIndex, yIndex); %otherwise just reveal that spot
+            end
+        end
+        if endGame < bombs && endGame >= 0 %if you haven't lost yet
+            endGame = 0;
+            for n = 1:height
+                for m = 1:width
+                    if gameMap(m, n) == 70 && mineTable(m, n) == 9 %check each bomb for a flag
+                        endGame = endGame + 1; %and add one to the endGame counter
+                    elseif gameMap(m, n) == 70 && mineTable(m, n) ~=9 %if there is a flag with no bomb
+                        endGame = endGame - 1; %remove one from the endGame counter so that you don't win unless only the bombs are flaged
+                    end
+                end
+            end
+        end
+    end
+end
+%the game ending loop
+if endGame == bombs %if all the bombs are flagged
+    gamesWon = gamesWon + 1; %add one to the amount of games one(for statistics)
+    disp('You Win') %say that you win
+    winStreak = winStreak + 1; %and up the win streak
+    gameTime = toc; %end the timer and store the time
+elseif endGame < 0 %if you lose
+    gamesLost = gamesLost + 1; %add one to the amount of games lost (for statistics)
+    disp('You Lose') %say that you lost
+    winStreak = 0; %and reset the win streak
+    gameTime = toc; %end the timer and store the time
+end

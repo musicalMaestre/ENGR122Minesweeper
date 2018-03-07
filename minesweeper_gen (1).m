@@ -13,7 +13,7 @@ percentLoss = (gamesLost / totalGames) * 100; %which ends here
 save('statistics.mat', 'gamesWon', 'gamesLost', 'allTimes', 'winStreak'); %saves the stats that everything is calculated from for the next go around
                                                                           %if you want to reset that stats run resetStats
 
-function gameMap = openSpots(row, col, mineTable, gameMap, height, width) %this function checks all spots and opens the spots around blank slots
+function gameMap = openSpots(mineTable, gameMap, height, width) %this function checks all spots and opens the spots around blank slots
 for n = 1:height
     for m = 1:width %for each spot
         for Row = n-1:n+1

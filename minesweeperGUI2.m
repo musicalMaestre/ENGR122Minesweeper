@@ -108,12 +108,14 @@ handles.bombs = 40;
 initializeGame(handles.X, handles.Y, handles.bombs);
 guidata(hObject, handles);
 
+
 % --- Executes on button press in Custom.
 function Custom_Callback(hObject, eventdata, handles)
 % hObject    handle to Custom (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 initializeGame(handles.X, handles.Y, handles.bombs);
+end
 
 % --- Executes on button press in Expert.
 function Expert_Callback(hObject, eventdata, handles)
@@ -125,6 +127,7 @@ handles.Y = 24;
 handles.bombs = 99;
 initializeGame(handles.X, handles.Y, handles.bombs);
 guidata(hObject, handles);
+
 
 % Custom Y value callback
 function CustomY_Callback(hObject, eventdata, handles)
@@ -163,6 +166,7 @@ function CustomBombs_Callback(hObject, eventdata, handles)
 handles.bombs = str2double(get(hObject, 'String'));
 guidata(hObject, handles);
 
+
 % --- Executes during object creation, after setting all properties.
 function CustomBombs_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to CustomBombs (see GCBO)
@@ -188,6 +192,7 @@ handles.X = str2double(get(hObject,'String'));
 guidata(hObject, handles);
 
 
+
 % --- Executes during object creation, after setting all properties.
 function CustomX_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to CustomX (see GCBO)
@@ -200,6 +205,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
+
 % --- Executes on mouse press over axes background.
 function gameWindow_ButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to gameWindow (see GCBO)
@@ -207,9 +213,12 @@ function gameWindow_ButtonDownFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 [handles.xClick, handles.yClick, handles.clickType] =  ginput(1);
 [tempX, tempY] = click2index(handles.xClick, handles.yClick);
+handles.xIndex = tempX;
+handles.yIndex = tempY;
 guidata(hObject, handles);
 
-function initializeGame(X, Y, bombs)
+
+function [mineTable, gameMap] = initializeGame(X, Y, bombs)
     uncovered = imread('facingDown.jpg'); %graphs the block image X * Y times in a 
     for i = 0:X
         for j = 0:Y
@@ -218,10 +227,14 @@ function initializeGame(X, Y, bombs)
         end
     end
     axis([0 X 0 Y]);
-    mineTable = zeros(handles.X,handles.Y); %creates a table where of zeros where the bombs and numbers will be placed
-    mineTable = placeBombs(handles.X, handles.Y, handles.bombs, mineTable); %runs a function to place the bombs on the mineTable
+    mineTable = zeros(X, Y); %creates a table where of zeros where the bombs and numbers will be placed
+    mineTable = placeBombs(X, Y, bombs, mineTable); %runs a function to place the bombs on the mineTable
     clear mineOverlay;
-    mineTable = numSet(mineTable, handles.X, handles.Y); %adds the numbers that go around it
+    mineTable = numSet(mineTable, X, Y); %adds the numbers that go around it
+    
+    gameMap = zeros(X, Y)
+    gameMap(:,:) = 10; %gameMap is now full of uncovered squares (10)
+    
     
 function mineTable = placeBombs(X, Y, bombs, mineTable) %creates the place of the bombs
 count = 0; %initalize a count which will allow us to place bombs until there are enough bombs
@@ -249,6 +262,7 @@ for n = 1:X
     end
 end
 
+
 function [allTimes, bestTime, avgTime, totalGames, percentWin, percentLoss] = statistics(allTimes, gameTime)
 allTimes = [allTimes, gameTime]; %these generate statistics 
 bestTime = min(allTimes);
@@ -266,6 +280,38 @@ guidata(hObjects, handles);
 
 save('statistics.mat', 'gamesWon', 'gamesLost', 'allTimes', 'winStreak'); %saves the stats that everything is calculated from for the next go around
 
+
 function [xIndex, yIndex] = click2index(xClick, yClick)
 xIndex = ceil(xClick);
 yIndex = ceil(yClick);
+
+
+function gameMap = openSpots(mineTable, gameMap, height, width) %this function checks all spots and opens the spots around blank slots
+for n = 1:height
+    for m = 1:width %for each spot
+        for Row = n-1:n+1
+            for Col = m-1:m+1 %for each spot around it
+                if Row >= 1 && Row <= height && Col >= 1 && Col <= width %if the spot being checked is within bounds
+                    if gameMap(m, n) == 0
+                        gameMap(Col, Row) = mineTable(Col, Row); %then reveal the spots around it
+                    end
+                end
+            end
+        end
+    end
+end
+for n = height:-1:1 %do it again but going the other way. this is too avoid recursive function because whenever I tried it like that it would return a stack overflow
+    for m = width:-1:1 %the first half does everything to the bottom and left of the point, and the second half does everything to the top and right
+        for Row = n-1:n+1
+            for Col = m-1:m+1
+                if Row >= 1 && Row <= height && Col >= 1 && Col <= width
+                    if gameMap(m, n) == 0
+                        gameMap(Col, Row) = mineTable(Col, Row);
+                    end
+                end
+            end
+        end
+    end
+end
+
+
