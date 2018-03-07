@@ -115,6 +115,7 @@ function Custom_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 initializeGame(handles.X, handles.Y, handles.bombs);
+end
 
 % --- Executes on button press in Expert.
 function Expert_Callback(hObject, eventdata, handles)
@@ -215,4 +216,66 @@ function gameWindow_ButtonDownFcn(hObject, eventdata, handles)
 handles.xIndex = tempX;
 handles.yIndex = tempY;
 guidata(hObject, handles);
- 
+
+
+function [mineTable, gameMap] = initializeGame(X, Y, bombs)
+    uncovered = imread('facingDown.jpg'); %graphs the block image X * Y times in a 
+    for i = 0:X
+        for j = 0:Y
+            image([0+i 1+i], [0+j 1+j], uncovered);
+            hold on
+        end
+    end
+    axis([0 X 0 Y]);
+    mineTable = zeros(X, Y); %creates a table where of zeros where the bombs and numbers will be placed
+    mineTable = placeBombs(X, Y, bombs, mineTable); %runs a function to place the bombs on the mineTable
+    clear mineOverlay;
+    mineTable = numSet(mineTable, X, Y); %adds the numbers that go around it
+    
+    gameMap = zeros(X, Y)
+    gameMap(:,:) = 10; %gameMap is now full of uncovered squares (10)
+    
+    
+function mineTable = placeBombs(X, Y, bombs, mineTable) %creates the place of the bombs
+count = 0; %initalize a count which will allow us to place bombs until there are enough bombs
+while count < bombs %while there are less bombs then needed
+    row = randi([1, X]);
+    col = randi([1, Y]); %choose a random x and y
+    if mineTable(row, col) ~= 9 %if there are no bombs on that spot
+        mineTable(row,col) = 9; %(9 = bomb) place a bomb there
+        count = count + 1; %and remember that there is one more bomb on the map
+    end
+end
+
+function mineTable = numSet(mineTable, X, Y) %creates the numbers around the bombs
+for n = 1:X
+    for m = 1:Y
+        if mineTable(n, m) == 9 %finds the bombs
+            for row = n-1:n+1
+                for col = m-1:m+1 %for each spot around it
+                    if row >= 1 && row <= handles.X && col >= 1 && col <= handles.Y && mineTable(row, col) ~= 9 %if the spot exists and is not a bomb
+                        mineTable(row, col) = mineTable(row, col) + 1; %add one to the value of that spot
+                    end
+                end
+            end
+        end
+    end
+end
+
+
+function [allTimes, bestTime, avgTime, totalGames, percentWin, percentLoss] = statistics(allTimes, gameTime)
+allTimes = [allTimes, gameTime]; %these generate statistics 
+bestTime = min(allTimes);
+avgTime = sum(allTimes)/numel(allTimes);
+totalGames = gamesWon + gamesLost;
+percentWin = (gamesWon / totalGames) * 100;
+percentLoss = (gameLost / totalGames) * 100; %which ends here
+
+set(handles.bestTimeDisplay, 'String', bestTime);
+set(handles.avgTimeDisplay, 'String', avgTime);
+set(handles.totalGameDisplay, 'String', totalGames);
+set(handles.percentWinDisplay, 'String', percentWin);
+set(handles.percentLossDisplay, 'String', percentLoss);
+guidata(hObjects, handles);
+
+save('statistics.mat', 'gamesWon', 'gamesLost', 'allTimes', 'winStreak'); %saves the stats that everything is calculated from for the next go around

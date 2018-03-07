@@ -54,3 +54,4 @@ elseif endGame < 0 %if you lose
     winStreak = 0; %and reset the win streak
     gameTime = toc; %end the timer and store the time
 end
+end
