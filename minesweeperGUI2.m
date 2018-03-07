@@ -56,6 +56,9 @@ function minesweeperGUI2_OpeningFcn(hObject, eventdata, handles, varargin)
     handles.X = 0;
     handles.Y = 0;
     handles.bombs = 0;
+    if exist('statistics.mat', 'file') == 0
+        resetStats;
+    end
     load('statistics.mat');
     
 % Choose default command line output for minesweeperGUI2
