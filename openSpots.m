@@ -1,4 +1,6 @@
-function gameMap = openSpots(mineTable, gameMap, height, width) %this function checks all spots and opens the spots around blank slots
+function openSpots(height, width) %this function checks all spots and opens the spots around blank slots
+global mineTable
+global gameMap
 for n = 1:height
     for m = 1:width %for each spot
         for Row = n-1:n+1

@@ -4,8 +4,7 @@ function initializeGame(X, Y, bombs)
     uncovered = imread('facingDown.jpg');
     for i = 1:X
         for j = 1:Y
-            image([i-1 i], [j-1 j], uncovered);
-            set(gca,'YDir','reverse');
+            image([i-1 1+i], [0+j 1+j], uncovered);
             hold on
         end
     end

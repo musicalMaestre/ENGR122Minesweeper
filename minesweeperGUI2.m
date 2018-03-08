@@ -22,7 +22,7 @@ function varargout = minesweeperGUI2(varargin)
 
 % Edit the above text to modify the response to help minesweeperGUI2
 
-% Last Modified by GUIDE v2.5 06-Mar-2018 21:13:59
+% Last Modified by GUIDE v2.5 07-Mar-2018 20:12:17
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -60,6 +60,11 @@ function minesweeperGUI2_OpeningFcn(hObject, eventdata, handles, varargin)
         resetStats;
     end
     load('statistics.mat');
+    handles.allTimes = allTimes;
+    handles.gamesLost = gamesLost;
+    handles.gamesWon = gamesWon;
+    handles.winStreak = winStreak;
+    hold on
     
 % Choose default command line output for minesweeperGUI2
 handles.output = hObject;
@@ -87,6 +92,7 @@ function Beginner_Callback(hObject, eventdata, handles)
 % hObject    handle to Beginner (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+cla
 handles.X = 9;
 handles.Y = 9;
 handles.bombs = 10;
@@ -102,6 +108,7 @@ function Intermediate_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of Intermediate
+cla
 handles.X = 16;
 handles.Y = 16;
 handles.bombs = 40;
@@ -114,6 +121,7 @@ function Custom_Callback(hObject, eventdata, handles)
 % hObject    handle to Custom (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+cla
 initializeGame(handles.X, handles.Y, handles.bombs);
 
 % --- Executes on button press in Expert.
@@ -121,6 +129,7 @@ function Expert_Callback(hObject, eventdata, handles)
 % hObject    handle to Expert (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+cla
 handles.X = 24;
 handles.Y = 24;
 handles.bombs = 99;
@@ -210,9 +219,15 @@ function gameWindow_ButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to gameWindow (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[handles.xClick, handles.yClick, handles.clickType] =  ginput(1);
-[tempX, tempY] = click2index(handles.xClick, handles.yClick);
-handles.xIndex = tempX;
-handles.yIndex = tempY;
+[xClick, yClick, handles.clickType] =  ginput(1);
+[handles.xIndex, handles.yIndex] = click2index(xClick, yClick);
 guidata(hObject, handles);
- 
+[handles.gamesWon, handles.gamesLost, handles.gameTime, handles.winStreak, bestTime, avgTime, totalGames, percentWin, percentLoss] = gamePlay(handles.bombs, handles.gamesWon, handles.gamesLost, handles.winStreak, handles.xIndex, handles.yIndex, handles.clickType, handles.allTimes);
+updateGUI();
+axis([-1 handles.X+1 -1 handles.Y+1]);
+set(handles.bestTimeDisplay, 'String', bestTime);
+set(handles.avgTimeDisplay, 'String', avgTime);
+set(handles.totalGameDisplay, 'String', totalGames);
+set(handles.percentWinDisplay, 'String', percentWin);
+set(handles.percentLossDisplay, 'String', percentLoss);
+guidata(hObject, handles);

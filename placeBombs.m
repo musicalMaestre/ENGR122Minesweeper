@@ -1,4 +1,5 @@
-function mineTable = placeBombs(X, Y, bombs, mineTable) %creates the place of the bombs
+function placeBombs(X, Y, bombs) %creates the place of the bombs
+global mineTable
 count = 0; %initalize a count which will allow us to place bombs until there are enough bombs
 while count < bombs %while there are less bombs then needed
     row = randi([1, X]);
